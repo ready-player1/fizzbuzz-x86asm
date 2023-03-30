@@ -3,23 +3,7 @@ main:
   mov %esp,%ebp
   mov $0x1,%ecx # カウンタ
 loop:
-
-print_fizzbuzz:
-  mov %ecx,%eax # 被除数
-  mov $0xf,%ebx # 除数
-  mov $0x0,%edx # ゼロ拡張
-  div %ebx      # 符号なし除算（edxとeaxを連結した値をオペランドの値で割る）
-  cmp $0x0,%edx # 余りがゼロか
-  jne print_fizz
-  # write
-  mov $0x9,%edx
-  push %ecx
-  lea (fizzbuzz),%ecx
-  mov $0x1,%ebx
-  mov $0x4,%eax
-  int $0x80
-  pop %ecx
-  jmp increment_counter
+  mov $0x0,%edi
 
 print_fizz:
   mov %ecx,%eax # 被除数
@@ -28,15 +12,15 @@ print_fizz:
   div %ebx      # 符号なし除算（edxとeaxを連結した値をオペランドの値で割る）
   cmp $0x0,%edx # 余りがゼロか
   jne print_buzz
+  add $0x1,%edi
   # write
-  mov $0x5,%edx
+  mov $0x4,%edx
   push %ecx
   lea (fizz),%ecx
   mov $0x1,%ebx
   mov $0x4,%eax
   int $0x80
   pop %ecx
-  jmp increment_counter
 
 print_buzz:
   mov %ecx,%eax # 被除数
@@ -45,17 +29,19 @@ print_buzz:
   div %ebx      # 符号なし除算（edxとeaxを連結した値をオペランドの値で割る）
   cmp $0x0,%edx # 余りがゼロか
   jne print_number
+  add $0x1,%edi
   # write
-  mov $0x5,%edx
+  mov $0x4,%edx
   push %ecx
   lea (buzz),%ecx
   mov $0x1,%ebx
   mov $0x4,%eax
   int $0x80
   pop %ecx
-  jmp increment_counter
 
 print_number:
+  test %edi,%edi
+  jnz print_newline
   mov %ecx,%eax # 被除数
 split_loop:
   mov $0xa,%ebx # 除数
@@ -75,7 +61,8 @@ print_digit:
   pop %ecx
   cmp %esp,%ebp # スタックが空か
   jne print_digit
-  # print a newline
+
+print_newline:
   mov $0x1,%edx
   push %ecx
   lea (newline),%ecx
@@ -93,12 +80,10 @@ increment_counter:
   mov $0x1,%eax
   int $0x80
 
-fizzbuzz:
-  .ascii "FizzBuzz\n"
 fizz:
-  .ascii "Fizz\n"
+  .ascii "Fizz"
 buzz:
-  .ascii "Buzz\n"
+  .ascii "Buzz"
 newline:
   .byte '\n
 numbers:
