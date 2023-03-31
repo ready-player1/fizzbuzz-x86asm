@@ -47,18 +47,19 @@ split_loop:
   mov $0xa,%ebx # 除数
   mov $0x0,%edx # ゼロ拡張
   div %ebx      # 符号なし除算（edxとeaxを連結した値をオペランドの値で割る）
+  add $0x30,%edx
   push %edx     # 余りをスタックに格納
   cmp $0x0,%eax # 商がゼロか
   jne split_loop
 print_digit:
   mov $0x1,%edx
-  pop %eax # split_loopでpushした1桁の数をpopする
   push %ecx
-  lea (numbers)(%eax),%ecx
+  lea 0x4(%esp),%ecx
   mov $0x1,%ebx
   mov $0x4,%eax
   int $0x80
-  pop %ecx
+  mov (%esp),%ecx
+  add $0x8,%esp
   cmp %esp,%ebp # スタックが空か
   jne print_digit
 
@@ -86,5 +87,3 @@ buzz:
   .ascii "Buzz"
 newline:
   .byte '\n
-numbers:
-  .byte '0,'1,'2,'3,'4,'5,'6,'7,'8,'9
